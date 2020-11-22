@@ -53,18 +53,23 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-//![Simple Timer_A Config]
-/* Timer_A PWM Configuration Parameter */
-Timer_A_PWMConfig pwmConfig =
-{
-        .clockSource = TIMER_A_CLOCKSOURCE_SMCLK,
-        .clockSourceDivider = TIMER_A_CLOCKSOURCE_DIVIDER_1,
-        .timerPeriod = 145, //440Hz
-        .compareRegister = TIMER_A_CAPTURECOMPARE_REGISTER_4,
-        .compareOutputMode = TIMER_A_OUTPUTMODE_RESET_SET,
-        .dutyCycle = 72 // 0.5 de dutycycle
-};
-//![Simple Timer_A Config]
+#include "sound.h"
+
+
+
+soundNote_t tDo = { .frequency = 245};
+soundNote_t tRe = { .frequency = 218};
+soundNote_t tMi = { .frequency = 194};
+soundNote_t tFa = { .frequency = 183};
+soundNote_t tSol = { .frequency = 164};
+soundNote_t tLa = { .frequency = 146};
+soundNote_t tSi = { .frequency = 130};
+
+
+static uint8_t ucPlay = 0;
+
+
+static void SysTick_INT(void);
 
 int main(void)
 {
@@ -86,23 +91,70 @@ int main(void)
     CS_initClockSignal(CS_SMCLK, CS_REFOCLK_SELECT, CS_CLOCK_DIVIDER_2);
     //PCM_setPowerState(PCM_AM_LF_VCORE0);
 
+
+    SysTick_registerInterrupt(SysTick_INT);
+    SysTick_setPeriod((CS_getDCOFrequency()/1000));
+    SysTick_enableInterrupt();
+    SysTick_enableModule();
     /* Configuring GPIO2.7 as peripheral output for PWM  and P6.7 for button
+
      * interrupt */
     GPIO_setAsPeripheralModuleFunctionOutputPin(GPIO_PORT_P2, GPIO_PIN7,
         GPIO_PRIMARY_MODULE_FUNCTION);
 
     /* Configuring Timer_A to have a period of approximately 500ms and
      * an initial duty cycle of 10% of that (3200 ticks)  */
-    Timer_A_generatePWM(TIMER_A0_BASE, &pwmConfig);
+    //Timer_A_generatePWM(TIMER_A0_BASE, &pwmConfig);
     //![Simple Timer_A Example]
 
+    SOUND_Play(tRe);
 
     while(1)
     {
-        
+        switch (ucPlay) {
+        case 0:
+            SOUND_Stop();
+            ucPlay = 0xFF;
+            break;
+        case 1:
+            SOUND_Play(tDo);
+            ucPlay = 0xFF;
+            break;
+        case 2:
+            SOUND_Play(tRe);
+            ucPlay = 0xFF;
+            break;
+        case 3:
+            SOUND_Play(tMi);
+            ucPlay = 0xFF;
+            break;
+        case 4:
+            SOUND_Play(tFa);
+            ucPlay = 0xFF;
+            break;
+        case 5:
+            SOUND_Play(tSol);
+            ucPlay = 0xFF;
+            break;
+        case 6:
+            SOUND_Play(tLa);
+            ucPlay = 0xFF;
+            break;
+        case 7:
+            SOUND_Play(tSi);
+            ucPlay = 0xFF;
+            break;
+        default:
+            break;
+        }
     }
 }
 
+uint32_t ulTemp = 0;
+static void SysTick_INT(void)
+{
+    ulTemp++;
+}
 
 
 /* ------------------------------------------------------------------------------------------------------------------- */
