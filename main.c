@@ -68,7 +68,6 @@ soundNote_t tLa = { .frequency = 146};
 soundNote_t tSi = { .frequency = 130};
 
 
-static uint8_t ucPlay = 0;
 
 
 static void SysTick_INT(void);
@@ -129,15 +128,23 @@ uint32_t ulTemp = 0;
 bool m_bPushed = false;
 static void SysTick_INT(void)
 {
-    uint8_t ucPinState = 0;
+    uint8_t ucButton1State = 0;
+    uint8_t ucButton2State = 0;
 
-    ucPinState = GPIO_getInputPinValue(GPIO_PORT_P3, GPIO_PIN5);
-    if(!ucPinState && !m_bPushed)
+    ucButton1State = GPIO_getInputPinValue(GPIO_PORT_P5, GPIO_PIN1);    //Bouton 1
+    ucButton2State = GPIO_getInputPinValue(GPIO_PORT_P3, GPIO_PIN5);    //Bouton 2
+
+    if(!ucButton1State && !m_bPushed)
       {
         SOUND_Play(tDo);
         m_bPushed = true;
     }
-    else if(ucPinState)
+    else if(!ucButton2State && !m_bPushed)
+      {
+        SOUND_Play(tRe);
+        m_bPushed = true;
+    }
+    else if(ucButton1State && ucButton2State)
     {
         SOUND_Stop();
         m_bPushed = false;
