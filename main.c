@@ -55,6 +55,7 @@
 
 #include "sound.h"
 #include "serial.h"
+#include "buttons.h"
 
 
 
@@ -96,9 +97,10 @@ int main(void)
     //PCM_setPowerState(PCM_AM_LF_VCORE0);
 
     Serial_Init();
+    BUTTONS_Init();
 
     SysTick_registerInterrupt(SysTick_INT);
-    SysTick_setPeriod((CS_getDCOFrequency()/100));
+    SysTick_setPeriod((CS_getDCOFrequency()/1000));
     SysTick_enableInterrupt();
     SysTick_enableModule();
 
@@ -124,59 +126,21 @@ int main(void)
 }
 
 uint32_t ulTemp = 0;
-bool btemp = false;
+bool m_bPushed = false;
 static void SysTick_INT(void)
 {
+    uint8_t ucPinState = 0;
 
-//    UART_transmitData(EUSCI_A0_BASE, 'A');
-
-    if (SERIAL_bButtonPushed)
-    {
-        SERIAL_bButtonPushed = false;
-//        switch (ucPlay)
-//        {
-//            case 0:
-//                SOUND_Stop();
-//                ucPlay = 0xFF;
-//                break;
-//            case 1:
-//                SOUND_Play(tDo);
-//                ucPlay = 0xFF;
-//                break;
-//            case 2:
-//                SOUND_Play(tRe);
-//                ucPlay = 0xFF;
-//                break;
-//            case 3:
-//                SOUND_Play(tMi);
-//                ucPlay = 0xFF;
-//                break;
-//            case 4:
-//                SOUND_Play(tFa);
-//                ucPlay = 0xFF;
-//                break;
-//            case 5:
-//                SOUND_Play(tSol);
-//                ucPlay = 0xFF;
-//                break;
-//            case 6:
-//                SOUND_Play(tLa);
-//                ucPlay = 0xFF;
-//                break;
-//            case 7:
-//                SOUND_Play(tSi);
-//                ucPlay = 0xFF;
-//                break;
-//            default:
-//                break;
-//        }
+    ucPinState = GPIO_getInputPinValue(GPIO_PORT_P3, GPIO_PIN5);
+    if(!ucPinState && !m_bPushed)
+      {
         SOUND_Play(tDo);
-        btemp = true;
+        m_bPushed = true;
     }
-    else
+    else if(ucPinState)
     {
         SOUND_Stop();
-        btemp = false;
+        m_bPushed = false;
     }
     ulTemp++;
 }
