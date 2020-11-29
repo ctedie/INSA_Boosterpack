@@ -56,19 +56,12 @@
 #include "sound.h"
 #include "serial.h"
 #include "buttons.h"
+#include "joystick.h"
 
 
+static bool m_bStart = false;
 
-soundNote_t tDo = { .frequency = 245};
-soundNote_t tRe = { .frequency = 218};
-soundNote_t tMi = { .frequency = 194};
-soundNote_t tFa = { .frequency = 183};
-soundNote_t tSol = { .frequency = 164};
-soundNote_t tLa = { .frequency = 146};
-soundNote_t tSi = { .frequency = 130};
-
-
-
+static void Start(void);
 
 static void SysTick_INT(void);
 
@@ -82,6 +75,15 @@ int main(void)
      *  - Init PWM on GPIO 2.7
      *  - Set PWM frequency at 440Hz
      */
+    Timer_A_PWMConfig pwmConfig =
+    {
+            .clockSource = TIMER_A_CLOCKSOURCE_SMCLK,
+            .clockSourceDivider = TIMER_A_CLOCKSOURCE_DIVIDER_1,
+            .timerPeriod = 145, //440Hz
+            .compareRegister = TIMER_A_CAPTURECOMPARE_REGISTER_4,
+            .compareOutputMode = TIMER_A_OUTPUTMODE_RESET_SET,
+            .dutyCycle = (145 >> 1) // 0.5 de dutycycle
+    };
 
     /* Setting DCO to 3MHz */
 
@@ -93,13 +95,15 @@ int main(void)
     CS_initClockSignal(CS_MCLK, CS_REFOCLK_SELECT, CS_CLOCK_DIVIDER_1);
     CS_initClockSignal(CS_SMCLK, CS_REFOCLK_SELECT, CS_CLOCK_DIVIDER_2);
 //    CS_setDCOCenteredFrequency(CS_DCO_FREQUENCY_24);
-    //PCM_setPowerState(PCM_AM_LF_VCORE0);
+    PCM_setPowerState(PCM_AM_LF_VCORE0);
 
     Serial_Init();
+    Sound_Init();
     BUTTONS_Init();
+    JOYSTICK_init();
 
     SysTick_registerInterrupt(SysTick_INT);
-    SysTick_setPeriod((CS_getDCOFrequency()/1000));
+    SysTick_setPeriod( (CS_getDCOFrequency()/1000) * 500 );
     SysTick_enableInterrupt();
     SysTick_enableModule();
 
@@ -112,6 +116,7 @@ int main(void)
 
     /* Configuring Timer_A to have a period of approximately 500ms and
      * an initial duty cycle of 10% of that (3200 ticks)  */
+//    SOUND_Play(tDo);
     //Timer_A_generatePWM(TIMER_A0_BASE, &pwmConfig);
     //![Simple Timer_A Example]
 
@@ -128,30 +133,39 @@ uint32_t ulTemp = 0;
 bool m_bPushed = false;
 static void SysTick_INT(void)
 {
-    uint8_t ucButton1State = 0;
-    uint8_t ucButton2State = 0;
+//    uint8_t ucButton1State = 0;
+//    uint8_t ucButton2State = 0;
+//
+//    ucButton1State = GPIO_getInputPinValue(GPIO_PORT_P5, GPIO_PIN1);    //Bouton 1
+//    ucButton2State = GPIO_getInputPinValue(GPIO_PORT_P3, GPIO_PIN5);    //Bouton 2
+//
+//    if(!ucButton1State && !m_bPushed)
+//      {
+//        SOUND_Play(tDo);
+//        m_bPushed = true;
+//    }
+//    else if(!ucButton2State && !m_bPushed)
+//      {
+//        SOUND_Play(tRe);
+//        m_bPushed = true;
+//    }
+//    else if(ucButton1State && ucButton2State)
+//    {
+//        SOUND_Stop();
+//        m_bPushed = false;
+//    }
 
-    ucButton1State = GPIO_getInputPinValue(GPIO_PORT_P5, GPIO_PIN1);    //Bouton 1
-    ucButton2State = GPIO_getInputPinValue(GPIO_PORT_P3, GPIO_PIN5);    //Bouton 2
-
-    if(!ucButton1State && !m_bPushed)
-      {
-        SOUND_Play(tDo);
-        m_bPushed = true;
-    }
-    else if(!ucButton2State && !m_bPushed)
-      {
-        SOUND_Play(tRe);
-        m_bPushed = true;
-    }
-    else if(ucButton1State && ucButton2State)
-    {
-        SOUND_Stop();
-        m_bPushed = false;
-    }
     ulTemp++;
 }
 
+
+
+static void Start(void)
+{
+    m_bStart = true;
+
+
+}
 
 /* ------------------------------------------------------------------------------------------------------------------- */
 /* ------------------------------------------------------------------------------------------------------------------- */
