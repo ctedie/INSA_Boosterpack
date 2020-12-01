@@ -59,12 +59,18 @@
 #include "joystick.h"
 #include "rgb_led.h"
 
+#include "HAL_MSP_EXP432P401R_Crystalfontz128x128_ST7735.h"
+#include "Crystalfontz128x128_ST7735.h"
+
+/* Graphic library context */
+Graphics_Context g_sContext;
 
 static bool m_bStart = false;
 
 static void Start(void);
 
 static void SysTick_INT(void);
+void drawTitle(void);
 
 int main(void)
 {
@@ -101,22 +107,26 @@ int main(void)
 //    JOYSTICK_init();
 //    RGB_LED_init();
 
+    /* Initializes display */
+    Crystalfontz128x128_Init();
+
+    /* Set default screen orientation */
+    Crystalfontz128x128_SetOrientation(LCD_ORIENTATION_UP);
+
+    /* Initializes graphics context */
+    Graphics_initContext(&g_sContext, &g_sCrystalfontz128x128, &g_sCrystalfontz128x128_funcs);
+    Graphics_setForegroundColor(&g_sContext, GRAPHICS_COLOR_RED);
+    Graphics_setBackgroundColor(&g_sContext, GRAPHICS_COLOR_WHITE);
+    GrContextFontSet(&g_sContext, &g_sFontFixed6x8);
+    drawTitle();
+
+
     SysTick_registerInterrupt(SysTick_INT);
     SysTick_setPeriod( (CS_getDCOFrequency()/1000) * 500 );
     SysTick_enableInterrupt();
     SysTick_enableModule();
 
 
-    /* Configuring GPIO2.7 as peripheral output for PWM  and P6.7 for button
-
-     * interrupt */
-
-    /* Configuring Timer_A to have a period of approximately 500ms and
-     * an initial duty cycle of 10% of that (3200 ticks)  */
-    //Timer_A_generatePWM(TIMER_A0_BASE, &pwmConfig);
-    //![Simple Timer_A Example]
-
-    /* Activation des interptions */
     Interrupt_enableMaster();
 
 
@@ -129,38 +139,21 @@ uint32_t ulTemp = 0;
 bool m_bPushed = false;
 static void SysTick_INT(void)
 {
-//    uint8_t ucButton1State = 0;
-//    uint8_t ucButton2State = 0;
-//
-//    ucButton1State = GPIO_getInputPinValue(GPIO_PORT_P5, GPIO_PIN1);    //Bouton 1
-//    ucButton2State = GPIO_getInputPinValue(GPIO_PORT_P3, GPIO_PIN5);    //Bouton 2
-//
-//    if(!ucButton1State && !m_bPushed)
-//      {
-//        SOUND_Play(tDo);
-//        m_bPushed = true;
-//    }
-//    else if(!ucButton2State && !m_bPushed)
-//      {
-//        SOUND_Play(tRe);
-//        m_bPushed = true;
-//    }
-//    else if(ucButton1State && ucButton2State)
-//    {
-//        SOUND_Stop();
-//        m_bPushed = false;
-//    }
 
     ulTemp++;
 }
 
 
 
-static void Start(void)
+void drawTitle()
 {
-    m_bStart = true;
-
-
+    Graphics_clearDisplay(&g_sContext);
+    Graphics_drawStringCentered(&g_sContext,
+                                    (int8_t *)"Essai",
+                                    AUTO_STRING_LENGTH,
+                                    64,
+                                    30,
+                                    OPAQUE_TEXT);
 }
 
 /* ------------------------------------------------------------------------------------------------------------------- */
