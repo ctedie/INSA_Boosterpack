@@ -15,18 +15,16 @@ bool m_bPlaying = false;
 
 void Sound_Init(void)
 {
-    tDo.frequency = 245;
-    tRe.frequency = 218;
-    tMi.frequency = 194;
-    tFa.frequency = 183;
-    tSol.frequency = 164;
-    tLa.frequency = 146;
-    tSi.frequency = 130;
+    tDo.frequency = 45866;  //261.63Hz
+    tRe.frequency = 40863;    //293.66
+    tMi.frequency = 36404;    //329.63Hz
+    tFa.frequency = 34361;    //349.23Hz
+    tSol.frequency = 30612;   //392.00Hz
+    tLa.frequency = 27273;    //440.00Hz
+    tSi.frequency = 24297;    //493.88
 
-//    Timer_A_clearInterruptFlag(TIMER_A0_BASE);
-//    Timer_A_enableCaptureCompareInterrupt(TIMER_A0_BASE, TIMER_A_CAPTURECOMPARE_REGISTER_4);
-//
-//    Interrupt_enableInterrupt(INT_TA0_N;)
+    GPIO_setAsPeripheralModuleFunctionOutputPin(GPIO_PORT_P2, GPIO_PIN7,
+        GPIO_PRIMARY_MODULE_FUNCTION);
 
 }
 bool SOUND_Play(soundNote_t tNote)
@@ -35,7 +33,7 @@ bool SOUND_Play(soundNote_t tNote)
     {
             .clockSource = TIMER_A_CLOCKSOURCE_SMCLK,
             .clockSourceDivider = TIMER_A_CLOCKSOURCE_DIVIDER_1,
-            .timerPeriod = tNote.frequency, //440Hz
+            .timerPeriod = tNote.frequency,
             .compareRegister = TIMER_A_CAPTURECOMPARE_REGISTER_4,
             .compareOutputMode = TIMER_A_OUTPUTMODE_RESET_SET,
             .dutyCycle = (tNote.frequency >> 1) // 0.5 de dutycycle
@@ -69,5 +67,5 @@ void SOUND_ChangeFrequency(soundNote_t *tNote, uint8_t ratio)
 
 void TA0_N_IRQHandler(void)
 {
-    Timer_A_clearCaptureCompareInterrupt
+//    Timer_A_clearCaptureCompareInterrupt
 }

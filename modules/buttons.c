@@ -43,13 +43,11 @@ bool BUTTONS_Init(void)
 
 void PORT3_IRQHandler(void)
 {
-    soundNote_t tNote;
     GPIO_clearInterruptFlag(GPIO_PORT_P3, GPIO_PIN5);
 
     if(GPIO_getInputPinValue(GPIO_PORT_P3, GPIO_PIN5) == GPIO_INPUT_PIN_LOW)
     {
-        tNote.frequency = tDo.frequency * m_usADCResult_filt;
-        SOUND_Play(tNote);
+        SOUND_Play(tDo);
         GPIO_interruptEdgeSelect(GPIO_PORT_P3, GPIO_PIN5, GPIO_LOW_TO_HIGH_TRANSITION);
     }
     else

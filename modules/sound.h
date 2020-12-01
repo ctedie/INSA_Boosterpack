@@ -28,6 +28,6 @@ soundNote_t tSi;
 void Sound_Init(void);
 bool SOUND_Play(soundNote_t tNote);
 bool SOUND_Stop(void);
-void SOUND_ChangeFrequency(void);
+void SOUND_ChangeFrequency(soundNote_t *tNote, uint8_t ratio);
 
 #endif /* SOUND_H_ */

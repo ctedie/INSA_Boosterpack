@@ -57,6 +57,7 @@
 #include "serial.h"
 #include "buttons.h"
 #include "joystick.h"
+#include "rgb_led.h"
 
 
 static bool m_bStart = false;
@@ -88,19 +89,17 @@ int main(void)
     /* Setting DCO to 3MHz */
 
 
-    //![Simple Timer_A Example]
-    /* Setting MCLK to REFO at 128Khz for LF mode
-     * Setting SMCLK to 64Khz */
-    CS_setReferenceOscillatorFrequency(CS_REFO_128KHZ);
-    CS_initClockSignal(CS_MCLK, CS_REFOCLK_SELECT, CS_CLOCK_DIVIDER_1);
-    CS_initClockSignal(CS_SMCLK, CS_REFOCLK_SELECT, CS_CLOCK_DIVIDER_2);
-//    CS_setDCOCenteredFrequency(CS_DCO_FREQUENCY_24);
-    PCM_setPowerState(PCM_AM_LF_VCORE0);
+    CS_setDCOCenteredFrequency(CS_DCO_FREQUENCY_12);
+    CS_initClockSignal(CS_MCLK, CS_DCOCLK_SELECT, CS_CLOCK_DIVIDER_1);
+    CS_initClockSignal(CS_HSMCLK, CS_DCOCLK_SELECT, CS_CLOCK_DIVIDER_1);
+    CS_initClockSignal(CS_SMCLK, CS_DCOCLK_SELECT, CS_CLOCK_DIVIDER_1);
+    CS_initClockSignal(CS_ACLK, CS_REFOCLK_SELECT, CS_CLOCK_DIVIDER_1);
 
-    Serial_Init();
+//    Serial_Init();
     Sound_Init();
     BUTTONS_Init();
-    JOYSTICK_init();
+//    JOYSTICK_init();
+//    RGB_LED_init();
 
     SysTick_registerInterrupt(SysTick_INT);
     SysTick_setPeriod( (CS_getDCOFrequency()/1000) * 500 );
@@ -111,12 +110,9 @@ int main(void)
     /* Configuring GPIO2.7 as peripheral output for PWM  and P6.7 for button
 
      * interrupt */
-    GPIO_setAsPeripheralModuleFunctionOutputPin(GPIO_PORT_P2, GPIO_PIN7,
-        GPIO_PRIMARY_MODULE_FUNCTION);
 
     /* Configuring Timer_A to have a period of approximately 500ms and
      * an initial duty cycle of 10% of that (3200 ticks)  */
-//    SOUND_Play(tDo);
     //Timer_A_generatePWM(TIMER_A0_BASE, &pwmConfig);
     //![Simple Timer_A Example]
 
