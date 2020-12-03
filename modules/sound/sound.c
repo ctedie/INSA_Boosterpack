@@ -29,18 +29,22 @@ soundSong_t music[] =
 double m_pdNotes[] =
 {
      DO_FREQUENCY_3   ,
-     REb_FREQUENCY_3  ,
+//     REb_FREQUENCY_3  ,
      RE_FREQUENCY_3   ,
-     MIb_FREQUENCY_3  ,
+//     MIb_FREQUENCY_3  ,
      MI_FREQUENCY_3   ,
      FA_FREQUENCY_3   ,
-     SOLb_FREQUENCY_3 ,
+//     SOLb_FREQUENCY_3 ,
      SOL_FREQUENCY_3  ,
-     LAb_FREQUENCY_3  ,
+     //LAb_FREQUENCY_3  ,
      LA_FREQUENCY_3   ,
-     SIb_FREQUENCY_3  ,
-     SI_FREQUENCY_3
+     //SIb_FREQUENCY_3  ,
+     SI_FREQUENCY_3   ,
+     DO_FREQUENCY_4   ,
+     NULL
 };
+
+uint8_t m_ucIndexNote = 0;
 
 void Sound_Init(void)
 {
@@ -98,63 +102,32 @@ void SOUND_ChangeFrequency(soundNote_t *tNote, uint8_t ratio)
    tNote->frequency =  tNote->frequency * ratio;
 }
 
-static bool m_bFirstTime = true;
-static uint32_t m_ulStartTick = 0;
-static bool m_bActive = true;
+static bool m_bEndDemo = false;
 void SOUND_Demo(uint32_t ulTick)
 {
-    //Must be called every periodically
-    uint32_t ulTime;
+    soundNote_t note;
 
-    if(m_bActive)
+    if(!m_bEndDemo)
     {
-        if(m_bFirstTime == true)
+        if((ulTick % 25) == 0)
         {
-            m_ulStartTick = ulTick;
-            m_bFirstTime = false;
-        }
-
-        ulTime = ulTick - m_ulStartTick;
-        if(ulTime <= 50)
-        {
-            SOUND_Play(tDo);
-        }
-        else if((50 < ulTime) && (ulTime <= 100))
-        {
-            SOUND_Play(tRe);
-        }
-        else if((100 < ulTime) && (ulTime <= 150))
-        {
-            SOUND_Play(tMi);
-        }
-        else if((150 < ulTime) && (ulTime <= 200))
-        {
-            SOUND_Play(tFa);
-        }
-        else if((200 < ulTime) && (ulTime <= 250))
-        {
-            SOUND_Play(tSol);
-        }
-        else if((250 < ulTime) && (ulTime <= 300))
-        {
-            SOUND_Play(tLa);
-        }
-        else if((300 < ulTime) && (ulTime <= 350))
-        {
-            SOUND_Play(tSi);
-        }
-        else
-        {
-            SOUND_Stop();
-            m_bActive = false;
+            if(m_pdNotes[m_ucIndexNote] != NULL)
+            {
+                note.frequency = (uint16_t)(12000000.0 / m_pdNotes[m_ucIndexNote]);
+                SOUND_Play(note);
+                m_ucIndexNote++;
+            }
+            else
+            {
+                SOUND_Stop();
+                m_bEndDemo = true;
+            }
         }
     }
 
 }
 
-void SOUND_Demo(uint32_t ulTick)
-{
-}
+
 void TA0_N_IRQHandler(void)
 {
 //    Timer_A_clearCaptureCompareInterrupt
