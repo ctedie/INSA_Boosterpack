@@ -17,6 +17,15 @@ typedef struct
 
 }soundNote_t;
 
+typedef struct
+{
+    soundNote_t* note;
+    uint16_t durattion;
+    uint16_t pause;
+}soundSong_t;
+
+
+
 soundNote_t tDo;
 soundNote_t tRe;
 soundNote_t tMi;
@@ -29,5 +38,6 @@ void Sound_Init(void);
 bool SOUND_Play(soundNote_t tNote);
 bool SOUND_Stop(void);
 void SOUND_ChangeFrequency(soundNote_t *tNote, uint8_t ratio);
+void SOUND_Demo(uint32_t ulTick);
 
 #endif /* SOUND_H_ */

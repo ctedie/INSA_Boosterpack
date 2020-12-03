@@ -54,10 +54,10 @@
 #include <stdbool.h>
 
 #include "sound.h"
-#include "serial.h"
-#include "buttons.h"
-#include "joystick.h"
-#include "rgb_led.h"
+//#include "serial.h"
+//#include "buttons.h"
+//#include "joystick.h"
+//#include "rgb_led.h"
 
 #include "HAL_MSP_EXP432P401R_Crystalfontz128x128_ST7735.h"
 #include "Crystalfontz128x128_ST7735.h"
@@ -122,7 +122,7 @@ int main(void)
 
 
     SysTick_registerInterrupt(SysTick_INT);
-    SysTick_setPeriod( (CS_getDCOFrequency()/1000) * 500 );
+    SysTick_setPeriod( (CS_getDCOFrequency()/1000) * 10  ); //10ms
     SysTick_enableInterrupt();
     SysTick_enableModule();
 
@@ -141,6 +141,7 @@ static void SysTick_INT(void)
 {
 
     ulTemp++;
+    SOUND_Demo(ulTemp);
 }
 
 
