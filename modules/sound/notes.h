@@ -67,6 +67,7 @@
 #define SIb_FREQUENCY_6         ((double)SIb_FREQUENCY_5  * 2)
 #define SI_FREQUENCY_6          ((double)SI_FREQUENCY_5   * 2)
 
+#define PAUSE   1
 
 
 /*--Types-------------------------------------------------------------*/

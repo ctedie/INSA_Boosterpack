@@ -12,19 +12,10 @@
 
 #include "sound.h"
 #include "notes.h"
+#include "song.h"
 
 
 bool m_bPlaying = false;
-soundSong_t music[] =
-{
- {&tDo, 500, 500 },
- {&tRe, 500, 500  },
- {&tMi, 500, 500  },
- {&tFa, 500, 500  },
- {&tSol, 500, 500 },
- {&tLa, 500, 500  },
- {&tSi, 500, 500  },
-};
 
 double m_pdNotes[] =
 {
@@ -76,9 +67,16 @@ bool SOUND_Play(soundNote_t tNote)
 
     if(tNote.frequency != m_tCurrentPlayingNote.frequency)
     {
-        Timer_A_generatePWM(TIMER_A0_BASE, &pwmConfig);
-        m_bPlaying = true;
-        m_tCurrentPlayingNote.frequency = tNote.frequency;
+        if(tNote.frequency != 1)
+        {
+            Timer_A_generatePWM(TIMER_A0_BASE, &pwmConfig);
+            m_bPlaying = true;
+            m_tCurrentPlayingNote.frequency = tNote.frequency;
+        }
+        else
+        {
+            SOUND_Stop();
+        }
     }
     else
     {
@@ -111,16 +109,21 @@ void SOUND_Demo(uint32_t ulTick)
     {
         if((ulTick % 25) == 0)
         {
-            if(m_pdNotes[m_ucIndexNote] != NULL)
+            if(g_pdPapaNoel[m_ucIndexNote] == PAUSE)
             {
-                note.frequency = (uint16_t)(12000000.0 / m_pdNotes[m_ucIndexNote]);
-                SOUND_Play(note);
+                SOUND_Stop();
                 m_ucIndexNote++;
             }
-            else
+            else if(g_pdPapaNoel[m_ucIndexNote] == NULL)
             {
                 SOUND_Stop();
                 m_bEndDemo = true;
+            }
+            else
+            {
+                note.frequency = (uint16_t)(12000000.0 / g_pdPapaNoel[m_ucIndexNote]);
+                SOUND_Play(note);
+                m_ucIndexNote++;
             }
         }
     }

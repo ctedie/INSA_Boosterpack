@@ -19,10 +19,9 @@ typedef struct
 
 typedef struct
 {
-    soundNote_t* note;
+    double Frequency;
     uint16_t durattion;
-    uint16_t pause;
-}soundSong_t;
+}soundPlayedNoteSong_t;
 
 
 

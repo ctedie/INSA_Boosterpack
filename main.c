@@ -82,16 +82,6 @@ int main(void)
      *  - Init PWM on GPIO 2.7
      *  - Set PWM frequency at 440Hz
      */
-    Timer_A_PWMConfig pwmConfig =
-    {
-            .clockSource = TIMER_A_CLOCKSOURCE_SMCLK,
-            .clockSourceDivider = TIMER_A_CLOCKSOURCE_DIVIDER_1,
-            .timerPeriod = 145, //440Hz
-            .compareRegister = TIMER_A_CAPTURECOMPARE_REGISTER_4,
-            .compareOutputMode = TIMER_A_OUTPUTMODE_RESET_SET,
-            .dutyCycle = (145 >> 1) // 0.5 de dutycycle
-    };
-
     /* Setting DCO to 3MHz */
 
 
