@@ -34,6 +34,13 @@ double g_pdPapaNoel[] =
      SOL_FREQUENCY_3  ,
      NULL
 };
+
+soundNote_t test[] =
+{
+ {DO_FREQUENCY_3, STYLE_CROCHE},
+ {RE_FREQUENCY_3, STYLE_NOIRE},
+ {MI_FREQUENCY_3, STYLE_BLANCHE},
+};
 /*--Prototype---------------------------------------------------------*/
 /*--Exported functions------------------------------------------------*/
 /*--Privaye functions-------------------------------------------------*/

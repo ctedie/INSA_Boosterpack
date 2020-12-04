@@ -71,6 +71,25 @@
 
 
 /*--Types-------------------------------------------------------------*/
+typedef enum
+{
+    STYLE_CROCHE    = 1,           //1/2 Temps
+    STYLE_NOIRE     = 2,            //1 Temps
+    STYLE_BLANCHE   = 4,          //2 Temps = 2 noires
+    STYLE_RONDE     = 8,            //4 Temps = 4 noires
+//    STYLE_DOUBLE_CROCHE,    //1/4 Temps
+//    STYLE_TRIPLE_CROCHE,    //1/8 Temps
+//    STYLE_QUADRUPLE_CROCHE, //1/16 Temps
+
+}styleNote_t;
+
+typedef struct
+{
+    uint16_t frequency;
+    styleNote_t style;
+
+}soundNote_t;
+
 /*--Variables---------------------------------------------------------*/
 /*--Prototype---------------------------------------------------------*/
 /*--Exported functions------------------------------------------------*/

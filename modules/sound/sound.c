@@ -16,6 +16,13 @@
 
 
 bool m_bPlaying = false;
+//soundPlayedNoteSong_t m_ptPN[] =
+//{
+// //TODO
+// {},
+//};
+
+
 
 double m_pdNotes[] =
 {
@@ -86,6 +93,38 @@ bool SOUND_Play(soundNote_t tNote)
     return true;
 }
 
+void SOUND_PlayNoteFromPartition(soundNote_t note)
+{
+    Timer_A_PWMConfig pwmConfig =
+    {
+            .clockSource = TIMER_A_CLOCKSOURCE_SMCLK,
+            .clockSourceDivider = TIMER_A_CLOCKSOURCE_DIVIDER_1,
+            .timerPeriod = (uint16_t)(12000000.0 / note.frequency),
+            .compareRegister = TIMER_A_CAPTURECOMPARE_REGISTER_4,
+            .compareOutputMode = TIMER_A_OUTPUTMODE_RESET_SET,
+            .dutyCycle = ((uint16_t)(12000000.0 / note.frequency) >> 1) // 0.5 de dutycycle
+    };
+
+    Timer_A_generatePWM(TIMER_A0_BASE, &pwmConfig);
+
+}
+
+
+void SOUND_PlayNote(uint16_t frequency)
+{
+    Timer_A_PWMConfig pwmConfig =
+    {
+            .clockSource = TIMER_A_CLOCKSOURCE_SMCLK,
+            .clockSourceDivider = TIMER_A_CLOCKSOURCE_DIVIDER_1,
+            .timerPeriod = frequency,
+            .compareRegister = TIMER_A_CAPTURECOMPARE_REGISTER_4,
+            .compareOutputMode = TIMER_A_OUTPUTMODE_RESET_SET,
+            .dutyCycle = (frequency >> 1) // 0.5 de dutycycle
+    };
+
+    Timer_A_generatePWM(TIMER_A0_BASE, &pwmConfig);
+}
+
 bool SOUND_Stop(void)
 {
     Timer_A_stopTimer(TIMER_A0_BASE);
@@ -101,30 +140,38 @@ void SOUND_ChangeFrequency(soundNote_t *tNote, uint8_t ratio)
 }
 
 static bool m_bEndDemo = false;
+static uint8_t remaining = 1;
+static bool newNote = true;
 void SOUND_Demo(uint32_t ulTick)
 {
-    soundNote_t note;
-
     if(!m_bEndDemo)
     {
-        if((ulTick % 25) == 0)
+        if(((ulTick % 33) == 0))  //Toute les 330ms pour une croche à 90BPM
         {
-            if(g_pdPapaNoel[m_ucIndexNote] == PAUSE)
+            if(newNote == true)
             {
-                SOUND_Stop();
-                m_ucIndexNote++;
+               remaining = (uint8_t)test[m_ucIndexNote].style;
+               newNote = false;
+               SOUND_PlayNoteFromPartition(test[m_ucIndexNote]);
             }
-            else if(g_pdPapaNoel[m_ucIndexNote] == NULL)
+            else // ||  && (remaining == 0)
             {
-                SOUND_Stop();
-                m_bEndDemo = true;
+                remaining--;
             }
-            else
-            {
-                note.frequency = (uint16_t)(12000000.0 / g_pdPapaNoel[m_ucIndexNote]);
-                SOUND_Play(note);
-                m_ucIndexNote++;
-            }
+
+//                m_ucIndexNote++;
+        }
+        else if (remaining == 0)
+        {
+
+            //Prochaine note
+            newNote = true;
+            m_ucIndexNote++;
+        }
+        else if(m_ucIndexNote > 2)
+        {
+            SOUND_Stop();
+
         }
     }
 

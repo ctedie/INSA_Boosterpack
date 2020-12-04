@@ -11,11 +11,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-typedef struct
-{
-    uint16_t frequency;
-
-}soundNote_t;
+#include "notes.h"
 
 typedef struct
 {
@@ -35,6 +31,8 @@ soundNote_t tSi;
 
 void Sound_Init(void);
 bool SOUND_Play(soundNote_t tNote);
+void SOUND_PlayNote(uint16_t frequency);
+void SOUND_PlayNoteFromPartition(soundNote_t note);
 bool SOUND_Stop(void);
 void SOUND_ChangeFrequency(soundNote_t *tNote, uint8_t ratio);
 void SOUND_Demo(uint32_t ulTick);

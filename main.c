@@ -131,7 +131,7 @@ static void SysTick_INT(void)
 {
 
     ulTemp++;
-    SOUND_Demo(ulTemp);
+    //SOUND_Demo(ulTemp);
 }
 
 
