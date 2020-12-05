@@ -14,6 +14,12 @@
 #include "notes.h"
 #include "song.h"
 
+typedef enum
+{
+    IN,
+    PROCESS,
+    OUT
+}stateProcess_t;
 
 bool m_bPlaying = false;
 //soundPlayedNoteSong_t m_ptPN[] =
@@ -43,6 +49,7 @@ double m_pdNotes[] =
 };
 
 uint8_t m_ucIndexNote = 0;
+void StateChart(void);
 
 void Sound_Init(void)
 {
@@ -139,44 +146,75 @@ void SOUND_ChangeFrequency(soundNote_t *tNote, uint8_t ratio)
    tNote->frequency =  tNote->frequency * ratio;
 }
 
+
+stateProcess_t state = IN;
+//stateProcess_t nextState = IN;
+static uint8_t remaining;
+void StateChart(void)
+{
+    switch (state)
+    {
+        case IN:
+            //Lecture de la note
+            if(m_ucIndexNote > 14)
+            {
+                state = OUT;
+                break;
+            }
+
+            remaining = (uint8_t)g_ptMonBeauSapin[m_ucIndexNote].style;
+            if(g_ptPapaNoel[m_ucIndexNote].pointe)
+            {
+                remaining += ((uint8_t)g_ptMonBeauSapin[m_ucIndexNote].style) / 2;
+            }
+            SOUND_PlayNoteFromPartition(g_ptMonBeauSapin[m_ucIndexNote]);
+            remaining--;
+            state = PROCESS;
+            break;
+        case PROCESS:
+            //On continue en fonction de la longeur de la note
+
+            if(remaining == 0)
+            {
+                //Note suivante
+                state = IN;
+                m_ucIndexNote++;
+//                if(m_ucIndexNote > 3)
+//                {
+//                    state = OUT;
+//                }
+            }
+            else
+            {
+                remaining--;
+            }
+            break;
+        case OUT:
+            // Note suivante
+            SOUND_Stop();
+            break;
+            default:
+                break;
+       }
+}
+
+
+
+
 static bool m_bEndDemo = false;
-static uint8_t remaining = 1;
 static bool newNote = true;
 void SOUND_Demo(uint32_t ulTick)
 {
     if(!m_bEndDemo)
     {
-        if(((ulTick % 33) == 0))  //Toute les 330ms pour une croche à 90BPM
+//        if(((ulTick % 16) == 0))  //Toute les 160ms pour une double croche à 90BPM
+        if(((ulTick % 20) == 0))  //Toute les 160ms pour une double croche à 90BPM
         {
-            if(newNote == true)
-            {
-               remaining = (uint8_t)test[m_ucIndexNote].style;
-               newNote = false;
-               SOUND_PlayNoteFromPartition(test[m_ucIndexNote]);
-            }
-            else // ||  && (remaining == 0)
-            {
-                remaining--;
-            }
-
-//                m_ucIndexNote++;
+            StateChart();
         }
-        else if (remaining == 0)
-        {
-
-            //Prochaine note
-            newNote = true;
-            m_ucIndexNote++;
-        }
-        else if(m_ucIndexNote > 2)
-        {
-            SOUND_Stop();
-
-        }
-    }
 
 }
-
+}
 
 void TA0_N_IRQHandler(void)
 {

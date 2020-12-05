@@ -18,7 +18,8 @@
 /*--Variables---------------------------------------------------------*/
 extern double g_pdPapaNoel[];
 extern soundNote_t test[];
-
+extern soundNote_t g_ptPapaNoel[];
+extern soundNote_t g_ptMonBeauSapin[];
 /*--Prototype---------------------------------------------------------*/
 /*--Exported functions------------------------------------------------*/
 
