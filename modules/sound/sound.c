@@ -4,7 +4,7 @@
  *  Created on: 22 nov. 2020
  *      Author: CT
  */
-
+/*--Includes---------------------------------------------------------*/
 #include <ti/devices/msp432p4xx/driverlib/driverlib.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -14,6 +14,9 @@
 #include "notes.h"
 #include "song.h"
 
+/*--Macro-------------------------------------------------------------*/
+
+/*--Types-------------------------------------------------------------*/
 typedef enum
 {
     IN,
@@ -21,37 +24,24 @@ typedef enum
     OUT
 }stateProcess_t;
 
-bool m_bPlaying = false;
-bool m_bIsPlaying = true;
-//soundPlayedNoteSong_t m_ptPN[] =
-//{
-// //TODO
-// {},
-//};
 
+/*--Variables---------------------------------------------------------*/
 
-
-double m_pdNotes[] =
-{
-     DO_FREQUENCY_3   ,
-//     REb_FREQUENCY_3  ,
-     RE_FREQUENCY_3   ,
-//     MIb_FREQUENCY_3  ,
-     MI_FREQUENCY_3   ,
-     FA_FREQUENCY_3   ,
-//     SOLb_FREQUENCY_3 ,
-     SOL_FREQUENCY_3  ,
-     //LAb_FREQUENCY_3  ,
-     LA_FREQUENCY_3   ,
-     //SIb_FREQUENCY_3  ,
-     SI_FREQUENCY_3   ,
-     DO_FREQUENCY_4   ,
-     NULL
-};
+static bool m_bIsPlaying = true;
 static soundNote_t* m_tSongToPlay;
-uint8_t m_ucIndexNote = 0;
+static uint8_t m_ucIndexNote = 0;
+soundNote_t m_tCurrentPlayingNote;
+
+stateProcess_t state = IN;
+//stateProcess_t nextState = IN;
+static uint8_t remaining;
+
+static bool m_bEndDemo = false;
+
+/*--Prototype---------------------------------------------------------*/
 void StateChart(void);
 
+/*--Exported functions------------------------------------------------*/
 void Sound_Init(void)
 {
     tDo.frequency = 45866;  //261.63Hz
@@ -67,7 +57,6 @@ void Sound_Init(void)
 
 }
 
-soundNote_t m_tCurrentPlayingNote;
 bool SOUND_Play(soundNote_t tNote)
 {
     Timer_A_PWMConfig pwmConfig =
@@ -85,7 +74,6 @@ bool SOUND_Play(soundNote_t tNote)
         if(tNote.frequency != 1)
         {
             Timer_A_generatePWM(TIMER_A0_BASE, &pwmConfig);
-            m_bPlaying = true;
             m_tCurrentPlayingNote.frequency = tNote.frequency;
         }
         else
@@ -117,27 +105,10 @@ void SOUND_PlayNoteFromPartition(soundNote_t note)
 
 }
 
-
-void SOUND_PlayNote(uint16_t frequency)
-{
-    Timer_A_PWMConfig pwmConfig =
-    {
-            .clockSource = TIMER_A_CLOCKSOURCE_SMCLK,
-            .clockSourceDivider = TIMER_A_CLOCKSOURCE_DIVIDER_1,
-            .timerPeriod = frequency,
-            .compareRegister = TIMER_A_CAPTURECOMPARE_REGISTER_4,
-            .compareOutputMode = TIMER_A_OUTPUTMODE_RESET_SET,
-            .dutyCycle = (frequency >> 1) // 0.5 de dutycycle
-    };
-
-    Timer_A_generatePWM(TIMER_A0_BASE, &pwmConfig);
-}
-
 bool SOUND_Stop(void)
 {
     Timer_A_stopTimer(TIMER_A0_BASE);
     m_tCurrentPlayingNote.frequency = 0;
-    m_bPlaying = false;
 
     return true;
 }
@@ -148,16 +119,12 @@ void SOUND_ChangeFrequency(soundNote_t *tNote, uint8_t ratio)
 }
 
 
-stateProcess_t state = IN;
-//stateProcess_t nextState = IN;
-static uint8_t remaining;
 void StateChart(void)
 {
     switch (state)
     {
-        case IN:
+        case IN:    //Lecture de la note
             m_bIsPlaying = true;
-            //Lecture de la note
             if(m_tSongToPlay[m_ucIndexNote].frequency == NULL)
             {
                 state = OUT;
@@ -173,9 +140,7 @@ void StateChart(void)
             remaining--;
             state = PROCESS;
             break;
-        case PROCESS:
-            //On continue en fonction de la longeur de  la note
-
+        case PROCESS:   // On continue en fonction de la longeur de  la note
             if(remaining == 0)
             {
                 //Note suivante
@@ -187,31 +152,32 @@ void StateChart(void)
                 remaining--;
             }
             break;
-        case OUT:
-            // Note suivante
+        case OUT: // Note suivante ou fin
             SOUND_Stop();
             m_bIsPlaying = false;
             break;
-            default:
-                break;
-       }
-}
-void SOUND_StartNewSong(SOUND_songs_t song)
-{
-    switch (song) {
-    case PAPA_NOEL:
-        m_tSongToPlay = g_ptPapaNoel;
-        state = IN;
-        m_ucIndexNote = 0;
-        break;
-    case BEAU_SAPIN:
-        m_tSongToPlay = g_ptMonBeauSapin;
-        state = IN;
-        m_ucIndexNote = 0;
-        break;
         default:
             break;
     }
+
+}
+void SOUND_StartNewSong(SOUND_songs_t song)
+{
+    switch (song)
+    {
+        case PAPA_NOEL:
+            m_tSongToPlay = g_ptPapaNoel;
+            state = IN;
+            break;
+        case BEAU_SAPIN:
+            m_tSongToPlay = g_ptMonBeauSapin;
+            state = IN;
+            break;
+        default:
+            state = OUT;
+            break;
+    }
+    m_ucIndexNote = 0;
 }
 
 bool SOUND_Playing(void)
@@ -219,7 +185,6 @@ bool SOUND_Playing(void)
     return m_bIsPlaying;
 }
 
-static bool m_bEndDemo = false;
 void SOUND_Demo(uint32_t ulTick)
 {
     if(!m_bEndDemo)
@@ -233,6 +198,7 @@ void SOUND_Demo(uint32_t ulTick)
 }
 }
 
+/*--Privaye functions-------------------------------------------------*/
 void TA0_N_IRQHandler(void)
 {
 //    Timer_A_clearCaptureCompareInterrupt

@@ -8,11 +8,14 @@
 #ifndef SOUND_H_
 #define SOUND_H_
 
+/*--Includes----------------------------------------------------------*/
 #include <stdint.h>
 #include <stdbool.h>
 
 #include "notes.h"
 
+/*--Macro-------------------------------------------------------------*/
+/*--Types-------------------------------------------------------------*/
 typedef struct
 {
     double Frequency;
@@ -26,6 +29,7 @@ typedef enum
 }SOUND_songs_t;
 
 
+/*--Variables---------------------------------------------------------*/
 soundNote_t tDo;
 soundNote_t tRe;
 soundNote_t tMi;
@@ -34,9 +38,9 @@ soundNote_t tSol;
 soundNote_t tLa;
 soundNote_t tSi;
 
+/*--Exported functions------------------------------------------------*/
 void Sound_Init(void);
 bool SOUND_Play(soundNote_t tNote);
-void SOUND_PlayNote(uint16_t frequency);
 void SOUND_PlayNoteFromPartition(soundNote_t note);
 bool SOUND_Stop(void);
 void SOUND_StartNewSong(SOUND_songs_t song);
