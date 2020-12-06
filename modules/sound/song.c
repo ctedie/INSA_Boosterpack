@@ -58,6 +58,8 @@ soundNote_t g_ptPapaNoel[] =
  {LA_FREQUENCY_3, STYLE_NOIRE, false},
  {SIb_FREQUENCY_3, STYLE_NOIRE, false},
  {LA_FREQUENCY_3, STYLE_BLANCHE, false},
+
+ {NULL, NULL, NULL}
 };
 
 //73BPM
@@ -83,6 +85,7 @@ soundNote_t g_ptMonBeauSapin[] =
  {SOL_FREQUENCY_3, STYLE_NOIRE, false},
  {FA_FREQUENCY_3, STYLE_NOIRE, false},
 
+ {NULL, NULL, NULL}
 };
 /*--Prototype---------------------------------------------------------*/
 /*--Exported functions------------------------------------------------*/

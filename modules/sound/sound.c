@@ -22,6 +22,7 @@ typedef enum
 }stateProcess_t;
 
 bool m_bPlaying = false;
+bool m_bIsPlaying = true;
 //soundPlayedNoteSong_t m_ptPN[] =
 //{
 // //TODO
@@ -47,7 +48,7 @@ double m_pdNotes[] =
      DO_FREQUENCY_4   ,
      NULL
 };
-
+static soundNote_t* m_tSongToPlay;
 uint8_t m_ucIndexNote = 0;
 void StateChart(void);
 
@@ -155,34 +156,31 @@ void StateChart(void)
     switch (state)
     {
         case IN:
+            m_bIsPlaying = true;
             //Lecture de la note
-            if(m_ucIndexNote > 14)
+            if(m_tSongToPlay[m_ucIndexNote].frequency == NULL)
             {
                 state = OUT;
                 break;
             }
 
-            remaining = (uint8_t)g_ptMonBeauSapin[m_ucIndexNote].style;
+            remaining = (uint8_t)m_tSongToPlay[m_ucIndexNote].style;
             if(g_ptPapaNoel[m_ucIndexNote].pointe)
             {
-                remaining += ((uint8_t)g_ptMonBeauSapin[m_ucIndexNote].style) / 2;
+                remaining += ((uint8_t)m_tSongToPlay[m_ucIndexNote].style) / 2;
             }
-            SOUND_PlayNoteFromPartition(g_ptMonBeauSapin[m_ucIndexNote]);
+            SOUND_PlayNoteFromPartition(m_tSongToPlay[m_ucIndexNote]);
             remaining--;
             state = PROCESS;
             break;
         case PROCESS:
-            //On continue en fonction de la longeur de la note
+            //On continue en fonction de la longeur de  la note
 
             if(remaining == 0)
             {
                 //Note suivante
                 state = IN;
                 m_ucIndexNote++;
-//                if(m_ucIndexNote > 3)
-//                {
-//                    state = OUT;
-//                }
             }
             else
             {
@@ -192,23 +190,42 @@ void StateChart(void)
         case OUT:
             // Note suivante
             SOUND_Stop();
+            m_bIsPlaying = false;
             break;
             default:
                 break;
        }
 }
+void SOUND_StartNewSong(SOUND_songs_t song)
+{
+    switch (song) {
+    case PAPA_NOEL:
+        m_tSongToPlay = g_ptPapaNoel;
+        state = IN;
+        m_ucIndexNote = 0;
+        break;
+    case BEAU_SAPIN:
+        m_tSongToPlay = g_ptMonBeauSapin;
+        state = IN;
+        m_ucIndexNote = 0;
+        break;
+        default:
+            break;
+    }
+}
 
-
-
+bool SOUND_Playing(void)
+{
+    return m_bIsPlaying;
+}
 
 static bool m_bEndDemo = false;
-static bool newNote = true;
 void SOUND_Demo(uint32_t ulTick)
 {
     if(!m_bEndDemo)
     {
 //        if(((ulTick % 16) == 0))  //Toute les 160ms pour une double croche à 90BPM
-        if(((ulTick % 20) == 0))  //Toute les 160ms pour une double croche à 90BPM
+        if(((ulTick % 16) == 0))  //Toute les 160ms pour une double croche à 90BPM
         {
             StateChart();
         }

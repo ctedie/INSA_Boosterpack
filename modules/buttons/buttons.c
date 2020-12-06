@@ -43,20 +43,11 @@ bool BUTTONS_Init(void)
 
 void PORT3_IRQHandler(void)
 {
+    SOUND_songs_t song = BEAU_SAPIN;
     GPIO_clearInterruptFlag(GPIO_PORT_P3, GPIO_PIN5);
 
-    if(GPIO_getInputPinValue(GPIO_PORT_P3, GPIO_PIN5) == GPIO_INPUT_PIN_LOW)
-    {
-        SOUND_Play(tDo);
-        GPIO_interruptEdgeSelect(GPIO_PORT_P3, GPIO_PIN5, GPIO_LOW_TO_HIGH_TRANSITION);
-    }
-    else
-    {
-        SOUND_Stop();
-        GPIO_interruptEdgeSelect(GPIO_PORT_P3, GPIO_PIN5, GPIO_HIGH_TO_LOW_TRANSITION);
-
-    }
-
+    if(!SOUND_Playing())
+        SOUND_StartNewSong(song);
 
 }
 
@@ -64,34 +55,16 @@ void PORT4_IRQHandler(void)
 {
     GPIO_clearInterruptFlag(GPIO_PORT_P4, GPIO_PIN1);
 
-    if(GPIO_getInputPinValue(GPIO_PORT_P4, GPIO_PIN1) == GPIO_INPUT_PIN_LOW)
-    {
-        SOUND_Play(tMi);
-        GPIO_interruptEdgeSelect(GPIO_PORT_P4, GPIO_PIN1, GPIO_LOW_TO_HIGH_TRANSITION);
-    }
-    else
-    {
-        SOUND_Stop();
-        GPIO_interruptEdgeSelect(GPIO_PORT_P4, GPIO_PIN1, GPIO_HIGH_TO_LOW_TRANSITION);
-
-    }
 
 }
 
 void PORT5_IRQHandler(void)
 {
+    SOUND_songs_t song = PAPA_NOEL;
     GPIO_clearInterruptFlag(GPIO_PORT_P5, GPIO_PIN1);
 
-    if(GPIO_getInputPinValue(GPIO_PORT_P5, GPIO_PIN1) == GPIO_INPUT_PIN_LOW)
-    {
-        SOUND_Play(tRe);
-        GPIO_interruptEdgeSelect(GPIO_PORT_P5, GPIO_PIN1, GPIO_LOW_TO_HIGH_TRANSITION);
-    }
-    else
-    {
-        SOUND_Stop();
-        GPIO_interruptEdgeSelect(GPIO_PORT_P5, GPIO_PIN1, GPIO_HIGH_TO_LOW_TRANSITION);
+    if(!SOUND_Playing())
+        SOUND_StartNewSong(song);
 
-    }
 
 }

@@ -19,7 +19,7 @@
 #define MI_FREQUENCY_3          ((double)329.63)
 #define FA_FREQUENCY_3          ((double)349.23)
 #define SOLb_FREQUENCY_3        ((double)369.99)
-#define SOL_FREQUENCY_3         ((double)392   )
+#define SOL_FREQUENCY_3         ((double)392.0   )
 #define LAb_FREQUENCY_3         ((double)415.3 )
 #define LA_FREQUENCY_3          ((double)440   )
 #define SIb_FREQUENCY_3         ((double)466.16)

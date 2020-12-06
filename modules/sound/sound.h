@@ -19,6 +19,11 @@ typedef struct
     uint16_t durattion;
 }soundPlayedNoteSong_t;
 
+typedef enum
+{
+    PAPA_NOEL,
+    BEAU_SAPIN
+}SOUND_songs_t;
 
 
 soundNote_t tDo;
@@ -34,6 +39,8 @@ bool SOUND_Play(soundNote_t tNote);
 void SOUND_PlayNote(uint16_t frequency);
 void SOUND_PlayNoteFromPartition(soundNote_t note);
 bool SOUND_Stop(void);
+void SOUND_StartNewSong(SOUND_songs_t song);
+bool SOUND_Playing(void);
 void SOUND_ChangeFrequency(soundNote_t *tNote, uint8_t ratio);
 void SOUND_Demo(uint32_t ulTick);
 
